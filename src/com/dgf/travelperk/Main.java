@@ -4,14 +4,13 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class Main {
 
     private static final ExecutorService executor = Executors.newWorkStealingPool();  //that's is key performance tuning, otherwise virtual memory get stacked!
-    private static final Solution s = new Solution((ForkJoinPool) executor);
+    private static final Solution s = new Solution(executor);
 
     public static void main(String[] args) {
         //Unit tests
@@ -29,15 +28,15 @@ public class Main {
         assertSolution(false, s.run(new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1}));
 
         //Performance tests
-        IntStream.range(10, 1000).forEachOrdered(i-> {
-            performanceTest(true, generateArray(i,true));
-            performanceTest(false, generateArray(i,false));
-        });
-        IntStream.of(1000,2000,3000,4000,5000,6000,7000,8000,9000).forEachOrdered(i-> {
-            performanceTest(true,  generateArray(i,true));
-            performanceTest(false,  generateArray(i,false));
-        });
-        IntStream.of(20000,30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
+//        IntStream.range(10, 1000).forEachOrdered(i-> {
+//            performanceTest(true, generateArray(i,true));
+//            performanceTest(false, generateArray(i,false));
+//        });
+//        IntStream.of(1000,2000,3000,4000,5000,6000,7000,8000,9000).forEachOrdered(i-> {
+//            performanceTest(true,  generateArray(i,true));
+//            performanceTest(false,  generateArray(i,false));
+//        });
+        IntStream.of(10000, 20000,30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
             performanceTest(true, generateArray(i,true));
             performanceTest(false, generateArray(i,false));
         });

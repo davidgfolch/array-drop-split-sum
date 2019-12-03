@@ -1,13 +1,12 @@
 # Array drop, split, sum
 
-## Test to develop
+## Test to implement
 In an array, drop two items & find three contiguous sub-arrays that sum the same result.
+The array can be up to 100000 items.
 
 ## Tech description 
 
-
 For each drop tuple, a thread runs to check if the result array has 3 contiguous sub-arrays summing same result. 
 
-Main.java - contains unit & performance tests.
-
-Solution.java - contains the algorithm.
+- Main.java - contains unit & performance tests.
+- Solution.java - contains the algorithm.

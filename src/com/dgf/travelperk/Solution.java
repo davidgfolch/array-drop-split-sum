@@ -1,26 +1,26 @@
 package com.dgf.travelperk;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Solution {
 
     private static final int _100000 = 100000;
-//    private static final String FIRST_DROP_D_MILLIS_D = "\r1rst Drop %d, millis: %d";
+    private static final String FIRST_DROP_D_MILLIS_D = "\r1rst Drop %d, millis: %d";
     private static final String CAN_T_EXECUTE_WORKER = "Can't execute worker";
 
-    private ForkJoinPool executor;
-
-    private long end;
-    private long start;
+    private final ForkJoinPool forkJoinPool;
+    private final ExecutorService executorService;
 
     private int drop1;
     private int drop2;
 
-    public Solution(ForkJoinPool executor) {
-        this.executor=executor;
+
+    public Solution(ExecutorService executor) {
+        this.forkJoinPool =(ForkJoinPool)executor;
+        this.executorService= executor;
     }
 
     public boolean run(int[] a) {
@@ -41,81 +41,91 @@ public class Solution {
     }
 
     private boolean processBigArr(int[] a) {
+//        long end;
+//        long start;
         final AtomicBoolean solutionFound= new AtomicBoolean(false);
+        final long preSum=preSum(a);
         for (drop1 = 0; drop1 < a.length - 1; drop1++) {
-            start=System.currentTimeMillis();
+//            start=System.currentTimeMillis();
             for (drop2 = drop1 +1; drop2 <a.length; drop2++) {
                 final int finalDrop1 = drop1;
                 final int finalDrop2 = drop2;
                 Runnable worker = () -> {
+                    final long finalSum=preSum-a[finalDrop1]-a[finalDrop2];
                     final int[] b = removeItems(a,finalDrop1,finalDrop2);
-                    if (checkArrSplit(b)) {
+                    if (checkSums(b,finalSum)) {
                         solutionFound.set(true);
                     }
                 };
                 if (solutionFound.get()) {
                     return true;
                 } else {
-                    try {
-//                        System.out.println("executor.getQueuedSubmissionCount(),executor.getParallelism()"+executor.getQueuedSubmissionCount()+","+executor.getParallelism());
-                        executor.execute(worker);
-                        if (executor.getQueuedSubmissionCount()>executor.getParallelism()*100) {
-                            try {
-//                                System.out.print("\rMain thread sleep for "+a.length+" -> executor "+executor);
-                                Thread.sleep(a.length/10);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                    //System.out.print("\rexecutor="+executorService);
+                    executorService.execute(worker);
+                    if (forkJoinPool.getQueuedSubmissionCount()>1000000) {
+                        //System.out.print("\rSleep main thread. Drop1="+drop1+" drop2="+drop2);
+                        try {
+                            //System.out.print("\rMain thread sleep for "+a.length+" -> executor "+ forkJoinPool +"   ");
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    } catch (RejectedExecutionException e) {
-                        if (!solutionFound.get())
-                            throw new RuntimeException(CAN_T_EXECUTE_WORKER, e);
                     }
                 }
             }
-            end=System.currentTimeMillis();
-//            System.out.print(String.format(FIRST_DROP_D_MILLIS_D, drop1, end - start) + executor);
+//            end=System.currentTimeMillis();
+//            System.out.print(String.format(FIRST_DROP_D_MILLIS_D, drop1, end - start) + " " +forkJoinPool);
 //            System.out.flush();
+        }
+        while (forkJoinPool.getQueuedSubmissionCount()>0) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return solutionFound.get();
     }
 
+    private long preSum(int[] arr) {
+        long totalSum=0;
+        for (int i : arr) totalSum += i;
+        return totalSum;
+    }
+
     private boolean processSmallArr(int[] a) {
         for (drop1 = 0; drop1 < a.length - 1; drop1++) {
-            start=System.currentTimeMillis();
             for (drop2 = drop1 +1; drop2 <a.length; drop2++) {
                 final int[] b = removeItems(a, drop1, drop2);
-                if (checkArrSplit(b)) {
+                if (checkSums(b, preSum(b))) {
                     return true;
                 }
             }
-            end=System.currentTimeMillis();
-            //System.out.print(String.format(FIRST_DROP_D_MILLIS_D, drop1,end-start));
         }
         return false;
     }
 
     private int[] removeItems(int[] a, int drop1, int drop2) {
-        int[] b=new int[a.length-2];
-        System.arraycopy(a,0,b,0,drop1);
-        System.arraycopy(a,drop1+1,b,drop1,drop2-drop1-1);
-        System.arraycopy(a,drop2+1,b,drop2-1,b.length-drop2+1);
+        int[] b=a.clone();
+        b[drop1]=0;
+        b[drop2]=0;
+//        int[] b=new int[a.length-2];
+//        System.arraycopy(a,0,b,0,drop1);
+//        System.arraycopy(a,drop1+1,b,drop1,drop2-drop1-1);
+//        System.arraycopy(a,drop2+1,b,drop2-1,b.length-drop2+1);
         return b;
     }
 
-    static boolean checkArrSplit(int[] arr) {
-        int preSum=0;
-        int split1=-1;
-        int totalSum=0;
-        int count;
-        for (count=0; count<arr.length; count++)
-            totalSum+=arr[count];
+    static boolean checkSums(int[] arr, final long totalSum) {
         if (totalSum%3!=0)
             return false;
         if (totalSum==0)
             return true;
-        int sum1=totalSum/3;
-        int sum2=2*sum1;
+        long preSum=0;
+        int split1=-1;
+        int count;
+        long sum1=totalSum/3;
+        long sum2=2*sum1;
         for (count=0; count<arr.length; count++) {
             preSum+=arr[count];
             if (preSum>0) {
