@@ -22,9 +22,13 @@ public class Main {
         assertSolution(false, s.run(new int[]{1, 1, 1, 1, 1, 1, 1}));
         assertSolution(true,  s.run(new int[]{1, 1, 1, 1, 1, 1, 1, 1}));
         assertSolution(false, s.run(new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1}));
+        IntStream.range(10, 99).forEachOrdered(i-> {
+            performanceTest(true, generateArray(i,true));
+            performanceTest(false, generateArray(i,false));
+        });
 
         //Performance tests
-//        IntStream.range(10, 1000).forEachOrdered(i-> {
+//        IntStream.range(110, 1000).forEachOrdered(i-> {
 //            performanceTest(true, generateArray(i,true));
 //            performanceTest(false, generateArray(i,false));
 //        });
@@ -34,7 +38,7 @@ public class Main {
             performanceTest(false,  generateArray(i,false));
         });
 //        IntStream.of(10000, 20000,30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
-        IntStream.of(10000,30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
+        IntStream.of(10000,20000, 30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
             performanceTest(true, generateArray(i,true));
             performanceTest(false, generateArray(i,false));
         });
