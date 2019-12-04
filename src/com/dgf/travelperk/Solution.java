@@ -3,9 +3,11 @@ package com.dgf.travelperk;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Solution {  //todo from 30000 items array is too slow, presum segments of array to increase speed?
+public class Solution {
 
-    private static final int _100000 = 100000;
+    private static final int MIN_ARR_LEN = 5;
+    private static final int MAX_ARR_LEN = 100000;
+    private static final String ARRAY_NOT_IN_RANGE = "Array not in range "+MIN_ARR_LEN+"-"+MAX_ARR_LEN+" items: ";
     private static final String FIRST_DROP_D_MILLIS_D = "\r1rst Drop %d, millis: %d";
     private static final String CAN_T_EXECUTE_WORKER = "Can't execute worker";
 
@@ -18,8 +20,8 @@ public class Solution {  //todo from 30000 items array is too slow, presum segme
         //split in 3 contiguous arrays
         //if sums return same values return true
         //else return false
-        if (a.length<5 || a.length>_100000){
-            System.out.println("Array not in range 5-100000 items: "+ Arrays.toString(a));
+        if (a.length< MIN_ARR_LEN || a.length> MAX_ARR_LEN){
+            System.out.println(ARRAY_NOT_IN_RANGE + Arrays.toString(a));
             return false;
         }
         if (a.length>100) {
@@ -48,6 +50,7 @@ public class Solution {  //todo from 30000 items array is too slow, presum segme
                     }
                 };
                 if (solutionFound.get()) {
+                    TaskManager.waitForPendentTasks();
                     return true;
                 } else {
                     //System.out.print("\rexecutor="+executorService);
