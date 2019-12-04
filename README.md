@@ -10,3 +10,4 @@ For each drop tuple, a thread runs to check if the result array has 3 contiguous
 
 - Main.java - contains unit & performance tests.
 - Solution.java - contains the algorithm.
+- TaskManager.java - helper for ExecutorService & ForkJoinPool (threads).

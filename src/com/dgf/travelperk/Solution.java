@@ -1,27 +1,16 @@
 package com.dgf.travelperk;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Solution {
+public class Solution {  //todo from 30000 items array is too slow, presum segments of array to increase speed?
 
     private static final int _100000 = 100000;
     private static final String FIRST_DROP_D_MILLIS_D = "\r1rst Drop %d, millis: %d";
     private static final String CAN_T_EXECUTE_WORKER = "Can't execute worker";
 
-    private final ForkJoinPool forkJoinPool;
-    private final ExecutorService executorService;
-
     private int drop1;
     private int drop2;
-
-
-    public Solution(ExecutorService executor) {
-        this.forkJoinPool =(ForkJoinPool)executor;
-        this.executorService= executor;
-    }
 
     public boolean run(int[] a) {
         //a size 5-100.000
@@ -51,6 +40,7 @@ public class Solution {
                 final int finalDrop1 = drop1;
                 final int finalDrop2 = drop2;
                 Runnable worker = () -> {
+                    if (solutionFound.get()) return;
                     final long finalSum=preSum-a[finalDrop1]-a[finalDrop2];
                     final int[] b = removeItems(a,finalDrop1,finalDrop2);
                     if (checkSums(b,finalSum)) {
@@ -61,29 +51,15 @@ public class Solution {
                     return true;
                 } else {
                     //System.out.print("\rexecutor="+executorService);
-                    executorService.execute(worker);
-                    if (forkJoinPool.getQueuedSubmissionCount()>1000000) {
-                        //System.out.print("\rSleep main thread. Drop1="+drop1+" drop2="+drop2);
-                        try {
-                            //System.out.print("\rMain thread sleep for "+a.length+" -> executor "+ forkJoinPool +"   ");
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    TaskManager.execute(worker);
+                    TaskManager.prioritizeTasks();
                 }
             }
 //            end=System.currentTimeMillis();
 //            System.out.print(String.format(FIRST_DROP_D_MILLIS_D, drop1, end - start) + " " +forkJoinPool);
 //            System.out.flush();
         }
-        while (forkJoinPool.getQueuedSubmissionCount()>0) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        TaskManager.waitForPendentTasks();
         return solutionFound.get();
     }
 
