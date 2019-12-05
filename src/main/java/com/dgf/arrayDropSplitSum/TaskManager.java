@@ -1,4 +1,4 @@
-package com.dgf.travelperk;
+package com.dgf.arrayDropSplitSum;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +30,7 @@ public class TaskManager {
 
     static void waitForPendentTasks() {
         while (forkJoinPool.getQueuedSubmissionCount()>0) {
+            System.out.print("\rwaitForPendentTasks...");
             try {
                 Thread.sleep(ONE_SECOND);
             } catch (InterruptedException e) {
@@ -49,5 +50,9 @@ public class TaskManager {
 
     static void execute(Runnable worker) {
         executor.execute(worker);
+    }
+
+    public static String printTasks() {
+        return executor.toString();
     }
 }

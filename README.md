@@ -11,3 +11,8 @@ For each drop tuple, a thread runs to check if the result array has 3 contiguous
 - Main.java - unit & performance tests.
 - Solution.java - algorithm implementation.
 - TaskManager.java - helper for ExecutorService & ForkJoinPool (threads).
+
+## Build & Run
+
+    mvn clean install
+    java -cp target/array-drop-split-sum-1.0-SNAPSHOT.jar com.dgf.arrayDropSplitSum.Main

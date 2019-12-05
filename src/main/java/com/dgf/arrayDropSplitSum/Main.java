@@ -1,4 +1,4 @@
-package com.dgf.travelperk;
+package com.dgf.arrayDropSplitSum;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -32,13 +32,13 @@ public class Main {
 //            performanceTest(true, generateArray(i,true));
 //            performanceTest(false, generateArray(i,false));
 //        });
-        IntStream.of(1000,2000).forEachOrdered(i-> {
-//        IntStream.of(1000,2000,3000,4000,5000,6000,7000,8000,9000).forEachOrdered(i-> {
-            performanceTest(true,  generateArray(i,true));
-            performanceTest(false,  generateArray(i,false));
-        });
+//        IntStream.of(1000,2000).forEachOrdered(i-> {
+////        IntStream.of(1000,2000,3000,4000,5000,6000,7000,8000,9000).forEachOrdered(i-> {
+//            performanceTest(true,  generateArray(i,true));
+//            performanceTest(false,  generateArray(i,false));
+//        });
 //        IntStream.of(10000, 20000,30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
-        IntStream.of(10000,20000, 30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
+        IntStream.of(30000,40000,50000,60000,70000,80000,90000,100000).forEachOrdered(i-> {
             performanceTest(true, generateArray(i,true));
             performanceTest(false, generateArray(i,false));
         });
