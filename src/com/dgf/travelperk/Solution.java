@@ -2,8 +2,6 @@ package com.dgf.travelperk;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 public class Solution {
 
@@ -37,7 +35,7 @@ public class Solution {
 //        long end;
 //        long start;
         final AtomicBoolean solutionFound= new AtomicBoolean(false);
-        final long[] preSumSegments=preSumSegments(a);
+        final int[] preSumSegments=preSumSegments(a);
         for (drop1 = 0; drop1 < a.length - 1; drop1++) {
 //            start=System.currentTimeMillis();
             for (drop2 = drop1 +1; drop2 <a.length; drop2++) {
@@ -69,10 +67,12 @@ public class Solution {
         return solutionFound.get();
     }
 
-    private long[] preSumSegments(int[] arr) {
-        long totalSum=0;
-        long partialSum=0;
-        long[] preSumSegments=new long[arr.length/10];  //todo fix division factor
+    private int[] preSumSegments(int[] arr) {
+        int totalSum=0;
+        int partialSum=0;
+//        int arrLen=arr.length/10;
+//        if (arrLen>2500) arrLen=2500;
+        int[] preSumSegments=new int[arr.length/10];
         int factor=arr.length/preSumSegments.length;
         int i, j=0;
         for (i=0; i<arr.length; i++) {
@@ -84,17 +84,17 @@ public class Solution {
             partialSum += arr[i];
         }
         preSumSegments[preSumSegments.length-1]=totalSum;
-        long res1=LongStream.of(Arrays.copyOfRange(preSumSegments,0,preSumSegments.length-1)).sum();
-        long res2=IntStream.of(Arrays.copyOfRange(arr,(preSumSegments.length-1)*factor,arr.length)).sum();
-        if (totalSum!=res1+res2) {
-            throw new RuntimeException("Invalid partial sums");
-        }
-        System.out.println("Summing by segments approach segments arr="+Arrays.toString(preSumSegments));
+//        int res1=IntStream.of(Arrays.copyOfRange(preSumSegments,0,preSumSegments.length-1)).sum();
+//        int res2=IntStream.of(Arrays.copyOfRange(arr,(preSumSegments.length-1)*factor,arr.length)).sum();
+//        if (totalSum!=res1+res2) {
+//            throw new RuntimeException("Invalid partial sums");
+//        }
+        System.out.println("Summing by segments approach. Pre-sum segments arr size/values="+preSumSegments.length+"/"+Arrays.toString(preSumSegments));
         return preSumSegments;
     }
 
-    private long preSum(int[] arr) {
-        long totalSum=0;
+    private int preSum(int[] arr) {
+        int totalSum=0;
         for (int i : arr) totalSum += i;
         return totalSum;
     }
@@ -122,14 +122,14 @@ public class Solution {
         return b;
     }
 
-    static boolean checkSums(int[] arr, final long totalSum) {
+    static boolean checkSums(int[] arr, final int totalSum) {
         Boolean preCheck = preCheck(totalSum);
         if (preCheck != null) return preCheck;
-        long preSum=0;
+        int preSum=0;
         int split1=-1;
         int count;
-        long sum1=totalSum/3;
-        long sum2=2*sum1;
+        int sum1=totalSum/3;
+        int sum2=2*sum1;
         for (count=0; count<arr.length; count++) {
             preSum+=arr[count];
             if (preSum>0) {
@@ -148,7 +148,7 @@ public class Solution {
         return false;
     }
 
-    private static Boolean preCheck(long totalSum) {
+    private static Boolean preCheck(int totalSum) {
         if (totalSum%3!=0)
             return false;
         if (totalSum==0)
@@ -156,12 +156,12 @@ public class Solution {
         return null;
     }
 
-    static boolean checkSumsBySegments(int[] origArr, final long[] preSumSegments, int drop1, int drop2) {
-        final long totalSum=preSumSegments[preSumSegments.length-1]-origArr[drop1]-origArr[drop2];
+    static boolean checkSumsBySegments(int[] origArr, final int[] preSumSegments, int drop1, int drop2) {
+        final int totalSum=preSumSegments[preSumSegments.length-1]-origArr[drop1]-origArr[drop2];
         Boolean preCheck = preCheck(totalSum);
         if (preCheck != null) return preCheck;
         int i, j, arrPos1, arrPos2, split1=-1, factor=origArr.length/preSumSegments.length;
-        long sum1=totalSum/3,
+        int sum1=totalSum/3,
                 sum2=2*sum1,
                 segmentValue,
                 segmentSum=0,
@@ -179,6 +179,7 @@ public class Solution {
             if (segmentSum>0) {
                 if (split1 == -1) {
                     if (segmentSum>sum1) {
+                        //if (i==0) return false;
                         unitSum=segmentSum-segmentValue;
                         for (j=i*factor;j<(i+1)*factor;j++) {
                             unitSum+=arr[j];
@@ -192,6 +193,7 @@ public class Solution {
                     } else if (segmentSum==sum1)
                         split1 = i*factor;
                 } else if (segmentSum>sum2) {
+                    //System.out.print("\rsegmentSum>sum2 "+segmentSum+">"+sum2);
                     unitSum=segmentSum-segmentValue;
                     for (j=i*factor;j<arr.length;j++) {
                         unitSum+=arr[j];
